@@ -18,14 +18,13 @@ export function App() {
 
 	const { article, refetchArticle, isFetching } = useRandomArticle();
 
-	if (!article) {
-		return <div>Loading...</div>;
-	}
+	useEffect(() => {
+		console.log('refetching article');
+		refetchArticle();
+	}, []);
 
 	const refetchIfTouching = useCallback(() => {
 		const isTouching = window.scrollY + window.innerHeight >= articleContainer.current?.clientHeight;
-
-		console.log({ isTouching, isFetching })
 
 		if (isTouching && !isFetching) {
 			refetchArticle();
@@ -33,6 +32,10 @@ export function App() {
 	}, [refetchArticle, articleContainer.current, isFetching]);
 
 	useEffect(() => {
+		if (!article) {
+			return;
+		}
+
 		setState({
 			articles: [...state.articles, article],
 		});
@@ -50,7 +53,7 @@ export function App() {
 		return () => {
 			window.removeEventListener('scroll', scrollListener);
 		}
-	}, []);
+	}, [refetchIfTouching]);
 
 	// ToDo:
 	// - Add a map component
